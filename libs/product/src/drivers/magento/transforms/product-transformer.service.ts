@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { DaffProductUnion } from '../../../models/product-union';
 import { DaffProductTransformerInterface } from '../../interfaces/product-transformer.interface';
-import { ProductNode } from '../models/product-node';
+import { MagentoProduct } from '../models/product/product';
 
 /**
  * Transforms magento products into an object usable by daffodil.
@@ -13,11 +13,11 @@ import { ProductNode } from '../models/product-node';
 export class DaffMagentoProductTransformerService implements DaffProductTransformerInterface<DaffProductUnion> {
 
   /**
-   * Transforms the magento ProductNode from the magento product query into a DaffProductUnion. 
+   * Transforms the magento MagentoProduct from the magento product query into a DaffProductUnion. 
    * @param response the response from a magento product query.
    */
   transform(response: any): DaffProductUnion {
-    const product: ProductNode = response.products.items[0];
+    const product: MagentoProduct = response.products.items[0];
     return {
       id: product.sku,
       url: product.url_key,
@@ -37,13 +37,13 @@ export class DaffMagentoProductTransformerService implements DaffProductTransfor
   }
 
   /**
-   * Transforms many magento ProductNodes from the magento product query into DaffProductUnions.
+   * Transforms many magento MagentoProducts from the magento product query into DaffProductUnions.
    */
   transformMany(products: any[]): DaffProductUnion[] {
     return products.map(this.transformList);
   }
 
-  private transformList(product: ProductNode): DaffProductUnion {
+  private transformList(product: MagentoProduct): DaffProductUnion {
     return {
       id: product.sku,
       url: product.url_key,

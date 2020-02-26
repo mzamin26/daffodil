@@ -9,10 +9,11 @@ import { DaffProductServiceInterface } from '../interfaces/product-service.inter
 import { DaffProductTransformer } from '../injection-tokens/product-transformer.token';
 import { DaffProductTransformerInterface } from '../interfaces/product-transformer.interface';
 import { DaffProductUnion } from '../../models/product-union';
-import { DaffSortField } from './models/sort-field';
-import { GetSortFieldsAndFiltersByCategory } from './queries/get-sort-fields-and-filters-by-category';
 import { GetAllProductsQuery } from './queries/get-all-products';
 import { GetProductQuery } from './queries/get-product';
+import { GetProductsForCategoryQuery } from './queries/get-all-products-for-category';
+import { MagentoGetProductsForCategoryRequest } from './models/get-products-for-category/get-products-for-category-request';
+import { MagentoGetProductsForCategoryResponse } from './models/get-products-for-category/get-products-for-category-response';
 
 /**
  * A service for making magento apollo queries for products of type, DaffProductUnion.
@@ -51,14 +52,22 @@ export class DaffMagentoProductService implements DaffProductServiceInterface<Da
     );
   }
 
-  getSortFieldsAndFiltersByCategory(categoryId: string): Observable<DaffSortField[]> {
+  /**
+   * Get an Observable of an array of products, aggregates, page info, and sorting options for a given set of categories.
+	 * This method will be moved to the category driver as soon as magento allows.
+   */
+  getAllProductsForCategory(request: MagentoGetProductsForCategoryRequest): Observable<MagentoGetProductsForCategoryResponse> {
     return this.apollo.query<any>({
-			query: GetSortFieldsAndFiltersByCategory,
+			query: GetProductsForCategoryQuery,
 			variables: {
-				categoryId: categoryId
+				filters: request.filters,
+				search: request.search,
+				pageSize: request.page_size,
+				currentPage: request.current_page,
+				sort: request.sort
 			}
 		}).pipe(
-      map(result => result.data.products.sort_fields.options)
+      map(result => result.data)
     );
   }
 

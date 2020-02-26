@@ -1,7 +1,7 @@
 /**
  * The product image object on a product retrieved from a magento backend.
  */
-export interface ProductImageNode {
+export interface MagentoProductImage {
   url: string;
   label: string;
 }

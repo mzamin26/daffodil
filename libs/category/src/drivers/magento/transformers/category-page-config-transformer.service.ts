@@ -18,16 +18,17 @@ export class DaffMagentoCategoryPageConfigTransformerService {
       current_page: categoryResponse.page_info.current_page,
 			total_pages: categoryResponse.page_info.total_pages,
 			total_products: categoryResponse.total_count,
-      filters: categoryResponse.aggregates.map(this.transformAggregate),
+      filters: categoryResponse.aggregates.map(this.transformAggregate.bind(this)),
 			sort_options: this.makeDefaultOptionFirst(categoryResponse.sort_fields).options,
 			product_ids: categoryResponse.products.map(product => product.sku)
     }
   }
 
   private transformAggregate(filter: MagentoAggregation): DaffCategoryFilter {
+
     return {
       label: filter.label,
-      type: DaffCategoryFilterTypes.Equal,
+      type: this.setAggregate(filter.attribute_code),
 			name: filter.attribute_code,
 			items_count: filter.count,
 			options: filter.options.map(option => {
@@ -38,6 +39,17 @@ export class DaffMagentoCategoryPageConfigTransformerService {
 				}
 			})
     }
+	}
+
+	private setAggregate(attribute_code): DaffCategoryFilterTypes {
+		if(attribute_code === 'category_id') return DaffCategoryFilterTypes.Equal;
+		if(attribute_code === 'description') return DaffCategoryFilterTypes.Match;
+		if(attribute_code === 'name') return DaffCategoryFilterTypes.Match;
+		if(attribute_code === 'price') return DaffCategoryFilterTypes.Range;
+		if(attribute_code === 'short_description') return DaffCategoryFilterTypes.Match;
+		if(attribute_code === 'sku') return DaffCategoryFilterTypes.Equal;
+		if(attribute_code === 'url_key') return DaffCategoryFilterTypes.Equal;
+		return DaffCategoryFilterTypes.Equal;
 	}
 
 	private makeDefaultOptionFirst(sort_fields: MagentoSortFields): MagentoSortFields {

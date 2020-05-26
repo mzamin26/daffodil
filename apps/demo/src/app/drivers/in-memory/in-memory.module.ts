@@ -9,6 +9,7 @@ import { DaffNewsletterInMemoryDriverModule } from '@daffodil/newsletter/testing
 import { DaffAuthInMemoryDriverModule } from '@daffodil/auth/testing';
 import { DemoInMemoryBackendService } from './backend/backend.service';
 
+import { DaffCategoryInMemoryDriverModule } from '@daffodil/category/testing';
 
 @NgModule({
   imports: [
@@ -18,7 +19,8 @@ import { DemoInMemoryBackendService } from './backend/backend.service';
     DaffCartInMemoryDriverModule.forRoot(),
     DaffCheckoutInMemoryDriverModule.forRoot(),
     DaffNavigationInMemoryDriverModule.forRoot(),
-    DaffNewsletterInMemoryDriverModule.forRoot()
+		DaffNewsletterInMemoryDriverModule.forRoot(),
+		DaffCategoryInMemoryDriverModule.forRoot()
   ]
 })
 export class DemoInMemoryDriverModule { }

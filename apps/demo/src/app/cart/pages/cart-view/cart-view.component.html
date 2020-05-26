@@ -2,3 +2,10 @@
 	<demo-cart *ngIf="!(loading$ | async)" [cart]="cart$ | async" class="demo-cart-view__cart"></demo-cart>
 	<daff-loading-icon *ngIf="loading$ | async"></daff-loading-icon>
 </daff-container>
+
+<button (click)="removeFirstItem()">remove first item</button>
+<button (click)="clearCart()">clear cart</button>
+<button (click)="updateQty()">update qty on first item</button>
+<button (click)="addToCart()">add to cart</button>
+<button (click)="addSecondToCart()">add 2 to cart</button>
+<button (click)="addThirdToCart()">add 3 to cart</button>

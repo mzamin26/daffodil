@@ -11,6 +11,7 @@ import { DaffNavigationMagentoDriverModule } from '@daffodil/navigation';
 import { DaffNewsletterInMemoryDriverModule } from '@daffodil/newsletter/testing';
 import { DaffCartMagentoDriverModule } from '@daffodil/cart';
 import { DaffAuthMagentoDriverModule } from '@daffodil/auth';
+import { DaffCategoryMagentoDriverModule } from '@daffodil/category';
 
 import { environment } from '../../../environments/environment';
 import { MagentoEnvironmentDriverConfiguration } from '../../../environments/environment.interface';
@@ -32,7 +33,9 @@ const cache = new InMemoryCache({ fragmentMatcher });
     DaffCartMagentoDriverModule.forRoot(),
     DaffCheckoutInMemoryDriverModule.forRoot(),
     DaffNavigationMagentoDriverModule.forRoot(),
-    DaffNewsletterInMemoryDriverModule.forRoot()
+		DaffNewsletterInMemoryDriverModule.forRoot(),
+		DaffCategoryMagentoDriverModule.forRoot()
+
   ]
 })
 export class DemoMagentoDriverModule {

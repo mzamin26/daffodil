@@ -14,7 +14,8 @@ export class CartComponent implements OnInit {
   @Input() cart: DaffCart;
 
   itemCount$ : Observable<number>;
-  isCartEmpty$: Observable<boolean>;
+	isCartEmpty$: Observable<boolean>;
+	loading$: Observable<boolean>;
 
   constructor(
 		private facade: DaffCartFacade<DaffCart>

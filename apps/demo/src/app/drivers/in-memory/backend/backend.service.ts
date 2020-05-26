@@ -15,6 +15,8 @@ import { DaffInMemoryBackendCartRootService } from '@daffodil/cart/testing';
 import { DaffInMemoryBackendCheckoutService } from '@daffodil/checkout/testing';
 import { DaffInMemoryBackendNavigationService } from '@daffodil/navigation/testing';
 import { DaffInMemoryBackendAuthService } from '@daffodil/auth/testing';
+import { DaffInMemoryBackendCategoryService } from '@daffodil/category/testing';
+import { DaffCategory } from '@daffodil/category';
 
 @Injectable({
   providedIn: 'root'
@@ -25,7 +27,8 @@ export class DemoInMemoryBackendService implements InMemoryDbService {
     private cartTestingService: DaffInMemoryBackendCartRootService,
     private checkoutTestingService: DaffInMemoryBackendCheckoutService,
     private navigationTestingService: DaffInMemoryBackendNavigationService,
-    private authTestingService: DaffInMemoryBackendAuthService
+    private authTestingService: DaffInMemoryBackendAuthService,
+    private categoryTestingService: DaffInMemoryBackendCategoryService
   ) {}
 
   parseRequestUrl(url: string, utils: RequestInfoUtilities): ParsedRequestUrl {
@@ -33,8 +36,8 @@ export class DemoInMemoryBackendService implements InMemoryDbService {
   }
 
   post(reqInfo: any) {
-    const collectionName = reqInfo.collectionName;
-    if (collectionName === 'cart') {
+		const collectionName = reqInfo.collectionName;
+    if (DaffInMemoryBackendCartRootService.COLLECTION_NAMES.indexOf(collectionName) > -1) {
       return this.cartTestingService.post(reqInfo);
     } else if (collectionName === 'checkout') {
       return this.checkoutTestingService.post(reqInfo);
@@ -51,15 +54,34 @@ export class DemoInMemoryBackendService implements InMemoryDbService {
       return this.productTestingService.get(reqInfo);
     } else if (collectionName === 'navigation') {
       return this.navigationTestingService.get(reqInfo);
-    }
-  }
+    } else if (collectionName === 'category') {
+			return this.categoryTestingService.get(reqInfo);
+		} else if(DaffInMemoryBackendCartRootService.COLLECTION_NAMES.indexOf(collectionName) > -1) {
+			return this.cartTestingService.get(reqInfo);
+		}
+	}
+	
+	put(reqInfo: any) {
+		const collectionName = reqInfo.collectionName;
+		if(DaffInMemoryBackendCartRootService.COLLECTION_NAMES.indexOf(collectionName) > -1) {
+			return this.cartTestingService.put(reqInfo);
+		}
+	}
+
+	delete(reqInfo: any) {
+		const collectionName = reqInfo.collectionName;
+		if(DaffInMemoryBackendCartRootService.COLLECTION_NAMES.indexOf(collectionName) > -1) {
+			return this.cartTestingService.delete(reqInfo);
+		}
+	}
 
   createDb(reqInfo: RequestInfo): MockDaffDatabase {
     return {
       ...this.productTestingService.createDb(),
       ...this.cartTestingService.createDb(reqInfo),
       ...this.checkoutTestingService.createDb(),
-      ...this.navigationTestingService.createDb()
+			...this.navigationTestingService.createDb(),
+			...this.categoryTestingService.createDb()
     };
   }
 }
@@ -69,4 +91,5 @@ export interface MockDaffDatabase {
   cart: DaffCart;
   order: DaffOrder;
   navigation: DaffNavigationTree;
+	category: DaffCategory;
 }

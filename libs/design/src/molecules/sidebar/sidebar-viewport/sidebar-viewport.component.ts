@@ -27,7 +27,7 @@ export class DaffSidebarViewportComponent implements OnInit, AfterViewInit {
    */
   _opened = false;
 
-  _mode: DaffSidebarMode = 'side';
+  _mode: DaffSidebarMode = 'push';
 
   /**
    * The mode to put the sidebar in
@@ -39,6 +39,16 @@ export class DaffSidebarViewportComponent implements OnInit, AfterViewInit {
     this._animationState = getAnimationState(this.opened, this.animationsEnabled);
   }
 
+  _fixed = false;
+  /**
+   * Boolean value to lock the sidebar in viewport.
+   */
+  @Input()
+  get fixed(): boolean { return this._fixed; }
+  set fixed(value: boolean) {
+    this._fixed = value;
+    this._animationState = getAnimationState(this.opened, this.animationsEnabled);
+  }
   /**
    * Input state for whether or not the backdrop is 
    * "visible" to the human eye
@@ -52,7 +62,7 @@ export class DaffSidebarViewportComponent implements OnInit, AfterViewInit {
   @Output() backdropClicked: EventEmitter<void> = new EventEmitter<void>();
 
   get animationsEnabled(): boolean {
-    return (this.mode === 'over' || this.mode === 'push') ? true : false;
+    return !this.fixed;
   }
 
   ngOnInit() {
@@ -84,7 +94,7 @@ export class DaffSidebarViewportComponent implements OnInit, AfterViewInit {
   }
 
   get hasBackdrop(): boolean {
-    return (this.mode === 'over' || this.mode === 'push');
+    return !this.fixed;
   }
   onEscape() {
     if (this.hasBackdrop) {

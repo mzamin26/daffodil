@@ -1,6 +1,6 @@
 import { daffAuthorizeNetReducer } from './authorize-net.reducer';
 import { DaffAuthorizeNetReducerState } from './authorize-net-reducer.interface';
-import { DaffAuthorizeNetUpdatePaymentSuccess, DaffAuthorizeNetUpdatePaymentFailure, DaffAuthorizeNetUpdatePayment } from '../../actions/authorizenet.actions';
+import { DaffAuthorizeNetUpdatePaymentSuccess, DaffAuthorizeNetUpdatePaymentFailure, DaffAuthorizeNetUpdatePayment, DaffAcceptJsLoaded } from '../../actions/authorizenet.actions';
 import { DaffCartAddress } from '@daffodil/cart';
 import { DaffCartAddressFactory } from '@daffodil/cart/testing';
 
@@ -14,6 +14,7 @@ describe('AuthorizeNet | AuthorizeNet Reducer', () => {
 		stubAddress = new DaffCartAddressFactory().create();
 		stubPaymentNonce = 'tokenResponse';
 		initialState = {
+			isAcceptLoaded: false,
 			loading: false,
 			error: null
 		};
@@ -86,5 +87,15 @@ describe('AuthorizeNet | AuthorizeNet Reducer', () => {
     it('sets error state to the action payload', () => {
       expect(result.error).toEqual('error');
 		});
-  });
+	});
+	
+	describe('when DaffAcceptJsLoaded is triggered', () => {
+		
+		it('should indicate that accept js has loaded', () => {
+      const acceptJsLoaded: DaffAcceptJsLoaded = new DaffAcceptJsLoaded();
+			const result = daffAuthorizeNetReducer(initialState, acceptJsLoaded);
+
+			expect(result.isAcceptLoaded).toEqual(true);
+		});
+	});
 });

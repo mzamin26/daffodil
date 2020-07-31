@@ -14,6 +14,7 @@ describe('DaffAuthorizeNetSelectors', () => {
 	let store: Store<DaffAuthorizeNetReducersState>;
 	const {
 		selectAuthorizeNetState,
+		selectIsAcceptJsLoaded,
 		selectLoading,
 		selectError
 	} = daffAuthorizeNetSelectors();
@@ -39,11 +40,21 @@ describe('DaffAuthorizeNetSelectors', () => {
     
     it('selects DaffAuthorizeNetReducerState', () => {
       const expectedFeatureState = {
+				isAcceptLoaded: false,
 				loading: false,
 				error: null
       }
       const selector = store.pipe(select(selectAuthorizeNetState));
       const expected = cold('a', { a: expectedFeatureState });
+      expect(selector).toBeObservable(expected);
+    });
+  });
+
+  describe('selectIsAcceptJsLoaded', () => {
+
+    it('selects whether the acceptJs library has loaded', () => {
+      const selector = store.pipe(select(selectIsAcceptJsLoaded));
+      const expected = cold('a', { a: false });
       expect(selector).toBeObservable(expected);
     });
   });

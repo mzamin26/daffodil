@@ -8,6 +8,7 @@ export interface DaffAuthorizeNetMemoizedSelectors {
 	selectAuthorizeNetState: MemoizedSelector<object, DaffAuthorizeNetReducerState> ;
 	selectLoading: MemoizedSelector<object, boolean>;
 	selectError: MemoizedSelector<object, string>;
+	selectIsAcceptJsLoaded: MemoizedSelector<object, boolean>;
 }
 
 const createAuthorizeNetSelectors = (): DaffAuthorizeNetMemoizedSelectors => {
@@ -41,11 +42,20 @@ const createAuthorizeNetSelectors = (): DaffAuthorizeNetMemoizedSelectors => {
 		(state: DaffAuthorizeNetReducerState) => state.error
 	);
 
+	/**
+	 * AcceptJs is loaded
+	 */
+	const selectIsAcceptJsLoaded = createSelector(
+		selectAuthorizeNetState, 
+		(state: DaffAuthorizeNetReducerState) => state.isAcceptLoaded
+	);
+
 	return { 
 		selectAuthorizeNetFeatureState,
 		selectAuthorizeNetState,
 		selectLoading,
-		selectError
+		selectError,
+		selectIsAcceptJsLoaded
 	}
 }
 

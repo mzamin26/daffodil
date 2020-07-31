@@ -12,15 +12,18 @@ import { DaffAuthorizeNetFacadeInterface } from './authorize-net-facade.interfac
 })
 export class DaffAuthorizeNetFacade implements DaffAuthorizeNetFacadeInterface {
 
+	isAcceptJsLoaded$: Observable<boolean>;
   loading$: Observable<boolean>;
   error$: Observable<string>;
   
   constructor(private store: Store<DaffAuthorizeNetReducersState>) {
 		const {
+			selectIsAcceptJsLoaded,
 			selectLoading,
 			selectError
 		} = daffAuthorizeNetSelectors();
 
+    this.isAcceptJsLoaded$ = this.store.pipe(select(selectIsAcceptJsLoaded));
     this.loading$ = this.store.pipe(select(selectLoading));
     this.error$ = this.store.pipe(select(selectError));
   }

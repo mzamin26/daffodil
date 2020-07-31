@@ -1,25 +1,29 @@
 import { Injectable, Inject } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
-import { tap, switchMap, catchError, map } from 'rxjs/operators';
+import { switchMap, catchError, map } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 
 import { DaffCartPaymentActionTypes, DaffCartPaymentUpdateWithBilling } from '@daffodil/cart';
-import { substream } from '@daffodil/core';
+import { substream, backoff } from '@daffodil/core';
 
 import { 
 	DaffAuthorizeNetActionTypes, 
 	DaffAuthorizeNetUpdatePayment, 
 	DaffAuthorizeNetUpdatePaymentFailure, 
 	DaffLoadAcceptJs,
-	DaffAuthorizeNetUpdatePaymentSuccess
+	DaffAuthorizeNetUpdatePaymentSuccess,
+	DaffAcceptJsLoaded
 } from '../actions/authorizenet.actions';
 import { DaffAuthorizeNetTokenRequest } from '../models/request/authorize-net-token-request';
 import { DaffAuthorizeNetService, DaffAuthorizeNetDriver } from '../drivers/interfaces/authorize-net-service.interface';
 import { DaffAuthorizeNetPaymentId } from '../drivers/interfaces/authorize-net-payment-id.token';
 import { DaffAuthorizeNetConfig, DaffAuthorizeNetConfigToken } from '../drivers/public_api';
+import { AcceptType } from '../models/acceptJs/accept';
 
 const ACCEPT_JS_SANDBOX_URL = 'https://jstest.authorize.net/v1/Accept.js';
 const ACCEPT_JS_PRODUCTION_URL = 'https://js.authorize.net/v1/Accept.js';
+
+declare var Accept: AcceptType;
 
 @Injectable()
 export class DaffAuthorizeNetEffects<T extends DaffAuthorizeNetTokenRequest = DaffAuthorizeNetTokenRequest> {
@@ -30,6 +34,8 @@ export class DaffAuthorizeNetEffects<T extends DaffAuthorizeNetTokenRequest = Da
 		@Inject(DaffAuthorizeNetPaymentId) private authorizeNetPaymentId: string,
 		@Inject(DaffAuthorizeNetConfigToken) public config: DaffAuthorizeNetConfig
 	){}
+
+	checkAcceptJsRetryTimer = 10;
 
   @Effect()
   updatePayment$ : Observable<any> = this.actions$.pipe(
@@ -66,16 +72,23 @@ export class DaffAuthorizeNetEffects<T extends DaffAuthorizeNetTokenRequest = Da
 		map((actions: Actions[]) => new DaffAuthorizeNetUpdatePaymentFailure('The payment method has failed to update the cart.'))
 	)
 	
-	@Effect({ dispatch: false })
+	@Effect()
   loadAcceptJs$ : Observable<any> = this.actions$.pipe(
     ofType(DaffAuthorizeNetActionTypes.LoadAcceptJsAction),
-		tap((action: DaffLoadAcceptJs) => {
-			const acceptJsScript = document.createElement('script');
-			acceptJsScript.async = true;
-			acceptJsScript.setAttribute('type', 'text/javascript');
-			acceptJsScript.setAttribute('src', this.config.production ? ACCEPT_JS_PRODUCTION_URL : ACCEPT_JS_SANDBOX_URL);
-			acceptJsScript.setAttribute('charset', 'utf-8');
-			document.body.appendChild(acceptJsScript);
-		})
-  )
+		map((action: DaffLoadAcceptJs) => {
+			if(typeof Accept === 'undefined') {
+				const acceptJsScript = document.createElement('script');
+				acceptJsScript.async = true;
+				acceptJsScript.setAttribute('type', 'text/javascript');
+				acceptJsScript.setAttribute('src', this.config.production ? ACCEPT_JS_PRODUCTION_URL : ACCEPT_JS_SANDBOX_URL);
+				acceptJsScript.setAttribute('charset', 'utf-8');
+				document.body.appendChild(acceptJsScript);
+			}
+		}),
+		switchMap(() => of(null).pipe(
+			map(() => Accept),
+			backoff(10, 50),
+			map(() => new DaffAcceptJsLoaded()),
+		))
+	)
 }

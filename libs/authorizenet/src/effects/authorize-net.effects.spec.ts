@@ -6,9 +6,10 @@ import { StoreModule, combineReducers, Store } from '@ngrx/store';
 import { MockStore } from '@ngrx/store/testing';
 
 import { DaffCartAddress, DaffCartPaymentUpdateWithBilling, DaffCartPaymentUpdateWithBillingSuccess, DaffCartPaymentUpdateWithBillingFailure } from '@daffodil/cart';
+import { DaffCartAddressFactory, DaffCartFactory } from '@daffodil/cart/testing';
 
 import { DaffAuthorizeNetEffects } from './authorize-net.effects';
-import { DaffAuthorizeNetUpdatePayment, DaffAuthorizeNetUpdatePaymentSuccess } from '../actions/authorizenet.actions';
+import { DaffAuthorizeNetUpdatePayment, DaffAuthorizeNetUpdatePaymentSuccess, DaffLoadAcceptJs } from '../actions/authorizenet.actions';
 import { DaffAuthorizeNetTokenRequest } from '../models/request/authorize-net-token-request';
 import { DaffAuthorizeNetUpdatePaymentFailure } from '../actions/authorizenet.actions';
 import { daffAuthorizeNetReducers } from '../reducers/authorize-net.reducers';
@@ -16,7 +17,6 @@ import { DaffAuthorizeNetService, DaffAuthorizeNetConfigToken, DaffAuthorizeNetC
 import { MAGENTO_AUTHORIZE_NET_PAYMENT_ID } from '../drivers/magento/authorize-net-payment-id';
 import { DaffAuthorizeNetDriver } from '../drivers/interfaces/authorize-net-service.interface';
 import { DaffAuthorizeNetPaymentId } from '../drivers/interfaces/authorize-net-payment-id.token';
-import { DaffCartAddressFactory, DaffCartFactory } from '@daffodil/cart/testing';
 
 class MockAuthorizeNetDriver implements DaffAuthorizeNetService {
 	generateToken(paymentRequest): Observable<any> {
@@ -135,6 +135,21 @@ describe('DaffAuthorizeNetEffects', () => {
 
 			const expected = cold('---c', { c: authorizeNetPaymentUpdateFailure });
 			expect(effects.updatePaymentFailureSubstream$).toBeObservable(expected);
+		});
+	});
+
+	describe('loadAcceptJs$', () => {
+		
+		it('should load the acceptJs library into the document', () => {
+			const loadAcceptJsAction = new DaffLoadAcceptJs();
+			actions$ = hot('--a', { a: loadAcceptJsAction });
+
+			effects.loadAcceptJs$.subscribe();
+			setTimeout(() => {
+				const scripts = document.getElementsByTagName('script');
+				expect(scripts[scripts.length-1].src).toEqual('https://jstest.authorize.net/v1/Accept.js');
+			});
+			expect(true).toBeTruthy();
 		});
 	});
 });

@@ -43,6 +43,15 @@ describe('DaffAuthorizeNetFacade', () => {
     expect(store.dispatch).toHaveBeenCalledTimes(1);
   });
 
+  describe('isAcceptJsLoaded$', () => {
+
+    it('should return false by default', () => {
+      const expected = cold('a', { a: false });
+      
+      expect(facade.isAcceptJsLoaded$).toBeObservable(expected);
+    });
+  });
+
   describe('loading$', () => {
 
     it('should return loading state for submitting a payment method', () => {
